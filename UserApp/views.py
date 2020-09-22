@@ -1,14 +1,22 @@
-import json
-import time
+import json, time, requests
 from hashlib import md5
-
-import requests
 from django.http import HttpResponse
+
+from UserApp.models import User
 
 
 def login(request):
-    # userphone = request.POST.get('userphone')
-    return HttpResponse('123')
+    userphone = request.POST.get('userphone')
+    verify_code = request.POST.get('post')
+
+    userphone_num = User.objects.filter(userPhone=userphone).count()
+    if userphone_num == 1:
+        return HttpResponse('登录成功')
+    elif userphone_num == 0:
+        # 注册完成后自动登录
+        user = User(userPhone=userphone)
+        user.save()
+        return HttpResponse('注册成功，正在登录')
 
 
 def phone_vcore(request):
