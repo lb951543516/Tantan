@@ -82,7 +82,49 @@ def show_profile(request):
 
 # 更新个人资料
 def update_profile(request):
-    return None
+    uid = request.session.get('uid')
+    user = User.objects.get(pk=uid)
+    user_set = User_setting.objects.filter(user_id=uid)[0]
+
+    # 获取用户提交来的数据
+    nickname = request.POST.get('nickname', user.nickname)
+    birthday = request.POST.get('birthday', user.birthday)
+    gender = request.POST.get('gender', user.gender)
+    location = request.POST.get('location', user.location)
+
+    dating_gender = request.POST.get('dating_gender', user_set.dating_gender)
+    dating_location = request.POST.get('dating_location', user_set.dating_location)
+    max_distance = request.POST.get('max_distance', user_set.max_distance)
+    min_distance = request.POST.get('min_distance', user_set.min_distance)
+    max_dating_age = request.POST.get('max_dating_age', user_set.max_dating_age)
+    min_dating_age = request.POST.get('min_dating_age', user_set.min_dating_age)
+    vibration = request.POST.get('vibration', user_set.vibration)
+    only_matched = request.POST.get('only_matched', user_set.only_matched)
+    auto_play = request.POST.get('auto_play', user_set.auto_play)
+
+    # 更新用户个人信息
+    user.nickname = nickname
+    user.birthday = birthday
+    user.gender = gender
+    user.location = location
+    user.save()
+
+    user_set.dating_gender = dating_gender
+    user_set.dating_location = dating_location
+    user_set.max_distance = max_distance
+    user_set.min_distance = min_distance
+    user_set.max_dating_age = max_dating_age
+    user_set.min_dating_age = min_dating_age
+    user_set.vibration = vibration
+    user_set.only_matched = only_matched
+    user_set.auto_play = auto_play
+    user_set.save()
+
+    data = {
+        'code': 0,
+        'data': '修改信息成功'
+    }
+    return JsonResponse(data=data)
 
 
 # 获取七牛云 Token

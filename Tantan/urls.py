@@ -21,7 +21,7 @@ urlpatterns = [
     path('api/user/vcode/fetch/', apis.fetch_code),
     path('api/user/vcode/submit/', apis.submit_code),
     path('api/user/profile/show/', apis.show_profile),
-    path('api/user/profile/update', apis.update_profile),
-    path('qiniu/token', apis.qn_token),
-    path('qiniu/callback', apis.qn_callback),
+    path('api/user/profile/update/', apis.update_profile),
+    path('qiniu/token/', apis.qn_token),
+    path('qiniu/callback/', apis.qn_callback),
 ]
