@@ -1,9 +1,14 @@
 from django.urls import path
-from UserApp import views
+from UserApp import apis
 
 urlpatterns = [
-    path('login/', views.login, name='login'),
+    # 提交手机号
+    path('vcode/fetch/', apis.getPhone, name='vcode/fetch'),
 
-    path('vcore/', views.phone_vcore, name='vcore'),
+    # 提交验证码，进行登录
+    path('vcode/submit/', apis.login, name='vcode/submit'),
+
+    # 获取验证码
+    path('vcode/', apis.phone_vcore, name='vcode'),
 
 ]
