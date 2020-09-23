@@ -14,11 +14,18 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
+from UserApp import apis as user_api
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # 用户
-    path('user/', include('UserApp.urls')),
+    # user模块
+    # 提交手机号
+    path('api/user/vcode/fetch/', user_api.fetch_vcode),
+    # 提交验证码，进行登录
+    path('api/user/vcode/submit/', user_api.submit_vcode),
+    # 查看个人信息
+    path('api/user/profile/show/', user_api.show_profile),
+
 ]
