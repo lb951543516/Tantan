@@ -23,15 +23,15 @@ def make_code(length=6):
 def send_code(phone):
     if not is_phonenum(phone):
         return False
-    else:
-        key = 'code-%s' % phone
 
-        # 检查缓存是否存在，防止在有效时间内频繁发送验证码
-        if cache.get(key):
-            return True
-        else:
-            # 手机号正确，发送验证码
-            code = make_code(6)
-            # 设置缓存，设置验证码的有效时间
-            cache.set(key, code, 600)
-            return send_sms(phone, code)
+    key = 'code-%s' % phone
+    # 检查缓存是否存在，防止在有效时间内频繁发送验证码
+    if cache.get(key):
+        return True
+
+    # 手机号正确，发送验证码
+    code = make_code(6)
+    print(code)
+    # 设置缓存，设置验证码的有效时间
+    cache.set(key, code, 600)
+    return send_sms(phone, code)

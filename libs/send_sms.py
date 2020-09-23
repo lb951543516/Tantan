@@ -18,14 +18,14 @@ def send_sms(phonenum, code):
     }
 
     # 安装关键字进行排序升序排列
-    sorted_args = sorted(args.items(), key=lambda d: d[0])
+    sorted_args = sorted(args.items())
     # 创建签名字符串：以"key=value" + "&"（连接符）+ "key=value"的方式连接所有参数
     args_str = '&'.join([f'{k}={v}' for k, v in sorted_args])
     # 在创建的字符串前后加上APPID和APPKEY拼接签名字符串,
-    sign_str = f'{config.SD_APPID}{config.SD_APPKEY}{args_str}{config.SD_APPID}{config.SD_APPKEY}'.encode('utf8')
+    sign_str = f'{config.SD_APPID}{config.SD_APPKEY}{args_str}{config.SD_APPID}{config.SD_APPKEY}'
+    sign_bytes = sign_str.encode('utf8')
     # 然后使用md5(string)或sha1(string)创建签名
-    signature = md5(sign_str).hexdigest()
-
+    signature = md5(sign_bytes).hexdigest()
     args['signature'] = signature
 
     response = requests.post(config.SD_API, data=args)

@@ -6,7 +6,7 @@ from UserApp.models import User
 
 
 # 用户获取手机验证码
-def fetch_vcode(request):
+def fetch_code(request):
     phonenum = request.GET.get('phonenum')
 
     if send_code(phonenum):
@@ -24,7 +24,7 @@ def fetch_vcode(request):
 
 
 # 提交手机验证码
-def submit_vcode(request):
+def submit_code(request):
     phonenum = request.POST.get('phonenum')
     code = request.POST.get('code')
 
@@ -81,4 +81,19 @@ def submit_vcode(request):
 
 # 查看个人资料
 def show_profile(request):
+    return None
+
+
+# 更新个人资料
+def update_profile(request):
+    return None
+
+
+# 获取七牛云 Token
+def qn_token(request):
+    return None
+
+
+# 七牛云回调接口
+def qn_callback(request):
     return None
