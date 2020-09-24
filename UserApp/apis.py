@@ -83,7 +83,7 @@ def show_profile(request):
     return JsonResponse(data=data)
 
 
-# 更新个人资料
+# 修改个人资料
 def update_profile(request):
     # 定义form对象，，注意两个模型的字段不能同名
     user_form = UserForm(request.POST)
@@ -93,7 +93,7 @@ def update_profile(request):
     if user_form.is_valid() and profile_form.is_valid():
         uid = request.session.get('uid')
 
-        # 更新用户个人信息
+        # 更新用户个人信息-------- **字典名，可以按照相同的key进行传值
         User.objects.filter(id=uid).update(**user_form.cleaned_data)
         Profile.objects.filter(id=uid).update(**profile_form.cleaned_data)
 
