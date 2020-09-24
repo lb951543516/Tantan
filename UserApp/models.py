@@ -29,8 +29,11 @@ class User(models.Model):
 
     @property
     def profile(self):
-        _profile, _ = Profile.objects.get_or_create(user_id=self.id)
-        return _profile
+        if not hasattr(self, '_profile'):
+            # 如果获取不到，就创建。第一个返回值是正常对象，第二个返回值是created=T/F
+            self._profile, created = Profile.objects.get_or_create(id=self.id)
+
+        return self._profile  # 当前用户对应的profile
 
     def to_dict(self):
         return {
