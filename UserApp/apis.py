@@ -29,14 +29,14 @@ def fetch_code(request):
 # 提交手机验证码
 def submit_code(request):
     phonenum = request.POST.get('phonenum')
-    code = request.POST.get('code')
+    vcode = request.POST.get('vcode')
 
     # 检查验证码是否正确
     key = 'code-%s' % phonenum
     cache_code = cache.get(key)
 
     # 验证码正确时...
-    if code and code == cache_code:
+    if vcode and vcode == cache_code:
         user_num = User.objects.filter(phonenum=phonenum).count()
         # 如果验证码正确并且已有帐号时...
         if user_num == 1:
