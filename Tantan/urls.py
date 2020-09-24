@@ -13,9 +13,15 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
 from django.urls import path
+from UserApp import apis
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # user模块
+    path('api/user/vcode/fetch/', apis.fetch_code),
+    path('api/user/vcode/submit/', apis.submit_code),
+    path('api/user/profile/show/', apis.show_profile),
+    path('api/user/profile/update/', apis.update_profile),
+    path('qiniu/token/', apis.qn_token),
+    path('qiniu/callback/', apis.qn_callback),
 ]
