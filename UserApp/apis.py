@@ -85,7 +85,7 @@ def show_profile(request):
 
 # 更新个人资料
 def update_profile(request):
-    # 定义form对象
+    # 定义form对象，，注意两个模型的字段不能同名
     user_form = UserForm(request.POST)
     profile_form = ProfileForm(request.POST)
 
@@ -96,9 +96,6 @@ def update_profile(request):
         # 更新用户个人信息
         User.objects.filter(id=uid).update(**user_form.cleaned_data)
         Profile.objects.filter(id=uid).update(**profile_form.cleaned_data)
-
-        print(user_form.cleaned_data)
-        print(profile_form.cleaned_data)
 
         data = {
             'code': 0,
