@@ -1,29 +1,27 @@
 from django.http import JsonResponse
 
-from UserApp.logics import send_code
+from UserApp.logics import send_vcode
 from UserApp.models import User, Profile
 from UserApp.forms import UserForm, ProfileForm
 from common import errors, keys
 
 from libs.qn_cloud import get_token, get_res_url
 from libs.cache import rds
+from libs.http import render_json
+
 
 # 用户获取手机验证码
 def fetch_code(request):
     phonenum = request.GET.get('phonenum')
+    # 异步调用--异步发送短信验证码
+    send_vcode.delay(phonenum)
 
-    if send_code(phonenum):
-        data = {
-            'code': errors.OK,
-            'data': None,
-        }
-        return JsonResponse(data=data)
-    else:
-        data = {
-            'code': errors.VCODE_FAILD,
-            'data': '验证码发送失败',
-        }
-        return JsonResponse(data=data)
+    # if send_code(phonenum):
+    #     return render_json()
+    # else:
+    #     data = render_json(data='验证码发送失败', code=errors.VCODE_FAILD)
+    #     return JsonResponse(data=data)
+    return render_json()
 
 
 # 提交手机验证码

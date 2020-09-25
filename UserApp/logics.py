@@ -4,6 +4,7 @@ import re
 from libs.send_sms import send_sms
 from libs.cache import rds
 from common import keys
+from tasks import celery_app
 
 
 # 验证手机号
@@ -21,7 +22,9 @@ def make_code(length=6):
 
 
 # 发送验证码
-def send_code(phone):
+# celery 异步处理任务
+@celery_app.tasks
+def send_vcode(phone):
     if not is_phonenum(phone):
         return False
 
