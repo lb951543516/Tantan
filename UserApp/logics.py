@@ -23,7 +23,7 @@ def make_code(length=6):
 
 # 发送验证码
 # celery 异步处理任务
-@celery_app.tasks
+@celery_app.task
 def send_vcode(phone):
     if not is_phonenum(phone):
         return False

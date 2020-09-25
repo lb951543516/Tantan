@@ -10,3 +10,5 @@ result_serializer = 'pickle'
 result_cache_max = 10000  # 任务结果最⼤缓存数量
 result_expires = 3600  # 任务结果过期时间
 worker_redirect_stdouts_level = 'INFO'
+
+'''celery worker -A tasks --loglevel=info'''
