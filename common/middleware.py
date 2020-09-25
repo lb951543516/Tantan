@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.utils.deprecation import MiddlewareMixin
+from common import errors
 
 
 class AuthMiddleware(MiddlewareMixin):
@@ -21,7 +22,7 @@ class AuthMiddleware(MiddlewareMixin):
         uid = request.session.get('uid')
         if not uid:
             data = {
-                'code': 1002,
+                'code': errors.LOGIN_REQUIRED,
                 'data': '用户未登录'
             }
             return JsonResponse(data=data)

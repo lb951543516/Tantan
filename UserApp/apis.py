@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from UserApp.logics import send_code
 from UserApp.models import User, Profile
 from UserApp.forms import UserForm, ProfileForm
+from common import errors, keys
 
 # 用户获取手机验证码
 from libs.qn_cloud import get_token, get_res_url
@@ -14,13 +15,13 @@ def fetch_code(request):
 
     if send_code(phonenum):
         data = {
-            'code': 0,
+            'code': errors.OK,
             'data': None,
         }
         return JsonResponse(data=data)
     else:
         data = {
-            'code': 1000,
+            'code': errors.VCODE_FAILD,
             'data': '验证码发送失败',
         }
         return JsonResponse(data=data)
@@ -32,7 +33,7 @@ def submit_code(request):
     vcode = request.POST.get('vcode')
 
     # 检查验证码是否正确
-    key = 'code-%s' % phonenum
+    key = keys.VCODE_K % phonenum
     cache_code = cache.get(key)
 
     # 验证码正确时...
@@ -43,7 +44,7 @@ def submit_code(request):
             user = User.objects.filter(phonenum=phonenum)[0]
 
             data = {
-                'code': 0,
+                'code': errors.OK,
                 'data': user.to_dict(),
             }
             return JsonResponse(data=data)
@@ -58,14 +59,14 @@ def submit_code(request):
             request.session['uid'] = user.id
 
             data = {
-                'code': 0,
+                'code': errors.OK,
                 'data': user.to_dict(),
             }
             return JsonResponse(data=data)
     # 验证码错误时...
     else:
         data = {
-            'code': 1001,
+            'code': errors.VCODE_ERR,
             'data': '验证码错误',
         }
         return JsonResponse(data=data)
@@ -77,7 +78,7 @@ def show_profile(request):
     profile = Profile.objects.filter(id=uid)[0]
 
     data = {
-        'code': 0,
+        'code': errors.OK,
         'data': profile.to_dict(),
     }
     return JsonResponse(data=data)
@@ -98,7 +99,7 @@ def update_profile(request):
         Profile.objects.filter(id=uid).update(**profile_form.cleaned_data)
 
         data = {
-            'code': 0,
+            'code': errors.OK,
             'data': '修改信息成功'
         }
         return JsonResponse(data=data)
@@ -107,7 +108,7 @@ def update_profile(request):
         err.update(user_form.errors)
         err.update(profile_form.errors)
         data = {
-            'code': 1003,
+            'code': errors.PROFILE_ERR,
             'data': err,
         }
         return JsonResponse(data=data)
@@ -120,7 +121,7 @@ def qn_token(request):
     token = get_token(uid, filename)
 
     data = {
-        'code': 0,
+        'code': errors.OK,
         'data': {
             'key': filename,
             'token': token,
@@ -139,7 +140,7 @@ def qn_callback(request):
     User.objects.filter(id=uid).update(avatar=avatar_url)
 
     data = {
-        'code': 0,
+        'code': errors.OK,
         'data': avatar_url,
     }
     return JsonResponse(data=data)

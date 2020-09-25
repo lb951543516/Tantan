@@ -3,6 +3,7 @@ import re
 from django.core.cache import cache
 
 from libs.send_sms import send_sms
+from common import keys
 
 
 # 验证手机号
@@ -24,7 +25,7 @@ def send_code(phone):
     if not is_phonenum(phone):
         return False
 
-    key = 'code-%s' % phone
+    key = keys.VCODE_K % phone
     # 检查缓存是否存在，防止在有效时间内频繁发送验证码
     if cache.get(key):
         return True
