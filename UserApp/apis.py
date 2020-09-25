@@ -1,4 +1,3 @@
-from django.core.cache import cache
 from django.http import JsonResponse
 
 from UserApp.logics import send_code
@@ -6,10 +5,10 @@ from UserApp.models import User, Profile
 from UserApp.forms import UserForm, ProfileForm
 from common import errors, keys
 
-# 用户获取手机验证码
 from libs.qn_cloud import get_token, get_res_url
+from libs.cache import rds
 
-
+# 用户获取手机验证码
 def fetch_code(request):
     phonenum = request.GET.get('phonenum')
 
@@ -34,7 +33,7 @@ def submit_code(request):
 
     # 检查验证码是否正确
     key = keys.VCODE_K % phonenum
-    cache_code = cache.get(key)
+    cache_code = rds.get(key)
 
     # 验证码正确时...
     if vcode and vcode == cache_code:

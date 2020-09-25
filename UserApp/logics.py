@@ -1,8 +1,8 @@
 import random
 import re
-from django.core.cache import cache
 
 from libs.send_sms import send_sms
+from libs.cache import rds
 from common import keys
 
 
@@ -27,12 +27,12 @@ def send_code(phone):
 
     key = keys.VCODE_K % phone
     # 检查缓存是否存在，防止在有效时间内频繁发送验证码
-    if cache.get(key):
+    if rds.get(key):
         return True
 
     # 手机号正确，发送验证码
     code = make_code(6)
     print(code)
     # 设置缓存，设置验证码的有效时间
-    cache.set(key, code, 600)
+    rds.set(key, code, 600)
     return send_sms(phone, code)
