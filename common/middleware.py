@@ -1,6 +1,6 @@
-from django.http import JsonResponse
 from django.utils.deprecation import MiddlewareMixin
 from common import errors
+from libs.http import render_json
 
 
 class AuthMiddleware(MiddlewareMixin):
@@ -21,8 +21,6 @@ class AuthMiddleware(MiddlewareMixin):
         # 如果当前路径不在白名单,检查是否登录
         uid = request.session.get('uid')
         if not uid:
-            data = {
-                'code': errors.LOGIN_REQUIRED,
-                'data': '用户未登录'
-            }
-            return JsonResponse(data=data)
+            return render_json(data='用户未登录', code=errors.LOGIN_REQUIRED)
+        else:
+            request.uid = uid

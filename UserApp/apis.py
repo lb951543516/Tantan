@@ -40,11 +40,7 @@ def submit_code(request):
         if user_num == 1:
             user = User.objects.filter(phonenum=phonenum)[0]
 
-            data = {
-                'code': errors.OK,
-                'data': user.to_dict(),
-            }
-            return JsonResponse(data=data)
+            return render_json(data=user.to_dict(), code=errors.OK)
 
         # 如果验证码正确 没有帐号时...
         elif user_num == 0:
@@ -55,18 +51,10 @@ def submit_code(request):
             # 设置session
             request.session['uid'] = user.id
 
-            data = {
-                'code': errors.OK,
-                'data': user.to_dict(),
-            }
-            return JsonResponse(data=data)
+            return render_json(data=user.to_dict(), code=errors.OK)
     # 验证码错误时...
     else:
-        data = {
-            'code': errors.VCODE_ERR,
-            'data': '验证码错误',
-        }
-        return JsonResponse(data=data)
+        return render_json(data='验证码错误', code=errors.VCODE_ERR)
 
 
 # 查看个人资料
@@ -74,11 +62,7 @@ def show_profile(request):
     uid = request.session.get('uid')
     profile = Profile.objects.filter(id=uid)[0]
 
-    data = {
-        'code': errors.OK,
-        'data': profile.to_dict(),
-    }
-    return JsonResponse(data=data)
+    return render_json(data=profile.to_dict(), code=errors.OK)
 
 
 # 修改个人资料
@@ -95,20 +79,13 @@ def update_profile(request):
         User.objects.filter(id=uid).update(**user_form.cleaned_data)
         Profile.objects.filter(id=uid).update(**profile_form.cleaned_data)
 
-        data = {
-            'code': errors.OK,
-            'data': '修改信息成功'
-        }
-        return JsonResponse(data=data)
+        return render_json(data='修改信息成功', code=errors.OK)
     else:
         err = {}
         err.update(user_form.errors)
         err.update(profile_form.errors)
-        data = {
-            'code': errors.PROFILE_ERR,
-            'data': err,
-        }
-        return JsonResponse(data=data)
+
+        return render_json(data=err, code=errors.PROFILE_ERR)
 
 
 # 获取七牛云 Token
@@ -118,13 +95,10 @@ def qn_token(request):
     token = get_token(uid, filename)
 
     data = {
-        'code': errors.OK,
-        'data': {
-            'key': filename,
-            'token': token,
-        },
+        'key': filename,
+        'token': token,
     }
-    return JsonResponse(data=data)
+    return render_json(code=errors.OK, data=data)
 
 
 # 七牛云回调
@@ -136,8 +110,4 @@ def qn_callback(request):
     avatar_url = get_res_url(key)
     User.objects.filter(id=uid).update(avatar=avatar_url)
 
-    data = {
-        'code': errors.OK,
-        'data': avatar_url,
-    }
-    return JsonResponse(data=data)
+    return render_json(data=avatar_url, code=errors.OK)
