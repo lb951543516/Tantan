@@ -1,5 +1,3 @@
-from django.http import JsonResponse
-
 from UserApp.logics import send_vcode
 from UserApp.models import User, Profile
 from UserApp.forms import UserForm, ProfileForm
@@ -39,6 +37,7 @@ def submit_code(request):
         # 如果验证码正确并且已有帐号时...
         if user_num == 1:
             user = User.objects.filter(phonenum=phonenum)[0]
+            request.session['uid'] = user.id
 
             return render_json(data=user.to_dict(), code=errors.OK)
 

@@ -30,14 +30,14 @@ urlpatterns = [
     path('qiniu/callback', user_api.qn_callback),
 
     # social模块
-    path('/api/social/rcmd', social_api.rcmd_users),
-    path('/api/social/like', social_api.like),
-    path('/api/social/superlike', social_api.superlike),
-    path('/api/social/dislike', social_api.dislike),
-    path('/api/social/rewind', social_api.rewind),
-    path('/api/social/fans', social_api.fans),
-    path('/api/social/friends', social_api.friends),
-    path('/api/social/rank', social_api.rank),
+    path('api/social/rcmd', social_api.rcmd_users),
+    path('api/social/like', social_api.like),
+    path('api/social/superlike', social_api.super_like),
+    path('api/social/dislike', social_api.dislike),
+    path('api/social/rewind', social_api.rewind),
+    path('api/social/fans', social_api.fans),
+    path('api/social/friends', social_api.friends),
+    path('api/social/rank', social_api.rank),
 
     # 前端页面--首页
     path('', views.index),
