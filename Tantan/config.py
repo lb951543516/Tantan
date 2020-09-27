@@ -18,6 +18,6 @@ QN_CALLBACK_DOMAIN = '119.45.201.6'
 # Redis配置
 REDIS = {
     'host': 'localhost',
-    'port': '6379',
+    'port': 6379,
     'db': 2,
 }

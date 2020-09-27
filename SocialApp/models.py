@@ -1,4 +1,7 @@
 from django.db import models
+from django.db import IntegrityError
+
+from common import errors
 
 
 class Slide(models.Model):
@@ -17,6 +20,14 @@ class Slide(models.Model):
         # 设置联合唯一，不能对同一个用户进行两次操作
         unique_together = ['uid', 'sid']
         db_table = 'slide'
+
+    @classmethod
+    def slide(cls, uid, sid, slide_type):
+        try:
+            cls.objects.create(uid=uid, sid=sid, slide_type=slide_type)
+        except IntegrityError:
+            # 抛出重复滑动异常
+            raise errors.RepeatSlideErr
 
     @classmethod
     def is_liked(cls, uid, sid):

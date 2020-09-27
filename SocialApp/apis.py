@@ -1,6 +1,7 @@
 from django.db.models import Max
 
 from SocialApp.models import Slide
+from UserApp.models import User
 from libs.http import render_json
 from SocialApp import logics
 from common import errors
@@ -34,7 +35,7 @@ def super_like(request):
 # 不喜欢
 def dislike(request):
     sid = int(request.POST.get('sid'))
-    Slide.objects.create(uid=request.uid, sid=sid, slide_type='dislike')
+    logics.dislike_someone(request.uid, sid)
     return render_json()
 
 
@@ -47,7 +48,13 @@ def rewind(request):
 
 # 喜欢我的
 def fans(request):
-    return render_json()
+    slides_list = Slide.objects.filter(
+        sid=request.uid, slide_type__in=['like', 'superlike']
+    ).values_list('uid', flat=True)
+
+    user_list = User.objects.filter(id__in=slides_list)
+    data = [user.to_dict() for user in user_list]
+    return render_json(data=data)
 
 
 # 好友列表

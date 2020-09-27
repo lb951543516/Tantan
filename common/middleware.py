@@ -21,6 +21,15 @@ class AuthMiddleware(MiddlewareMixin):
         # 如果当前路径不在白名单,检查是否登录
         uid = request.session.get('uid')
         if not uid:
-            return render_json(data='用户未登录', code=errors.LOGIN_REQUIRED)
+            return render_json(data='用户未登录', code=errors.LoginRequired.code)
         else:
             request.uid = uid
+
+
+class LogicErrMiddleware(MiddlewareMixin):
+    '''逻辑异常处理'''
+
+    def process_exception(self, request, exception):
+        if isinstance(exception, errors.LogicErr):
+            code = exception.code
+            return render_json(code=code)

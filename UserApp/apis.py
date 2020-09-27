@@ -39,7 +39,7 @@ def submit_code(request):
             user = User.objects.filter(phonenum=phonenum)[0]
             request.session['uid'] = user.id
 
-            return render_json(data=user.to_dict(), code=errors.OK)
+            return render_json(data=user.to_dict())
 
         # 如果验证码正确 没有帐号时...
         elif user_num == 0:
@@ -50,10 +50,10 @@ def submit_code(request):
             # 设置session
             request.session['uid'] = user.id
 
-            return render_json(data=user.to_dict(), code=errors.OK)
+            return render_json(data=user.to_dict())
     # 验证码错误时...
     else:
-        return render_json(data='验证码错误', code=errors.VCODE_ERR)
+        raise errors.VcodeErr('验证码错误')
 
 
 # 查看个人资料
@@ -61,7 +61,7 @@ def show_profile(request):
     uid = request.session.get('uid')
     profile = Profile.objects.filter(id=uid)[0]
 
-    return render_json(data=profile.to_dict(), code=errors.OK)
+    return render_json(data=profile.to_dict())
 
 
 # 修改个人资料
@@ -78,13 +78,12 @@ def update_profile(request):
         User.objects.filter(id=uid).update(**user_form.cleaned_data)
         Profile.objects.filter(id=uid).update(**profile_form.cleaned_data)
 
-        return render_json(data='修改信息成功', code=errors.OK)
+        return render_json(data='修改信息成功')
     else:
         err = {}
         err.update(user_form.errors)
         err.update(profile_form.errors)
-
-        return render_json(data=err, code=errors.PROFILE_ERR)
+        raise errors.ProfileErr(data=err)
 
 
 # 获取七牛云 Token
