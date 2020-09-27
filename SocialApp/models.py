@@ -6,7 +6,7 @@ class Slide(models.Model):
     STYPES = (
         ('like', '喜欢'),
         ('superlike', '超级喜欢'),
-        ('dislkie', '不喜欢'),
+        ('dislike', '不喜欢'),
     )
     uid = models.IntegerField(verbose_name='滑动用户')
     sid = models.IntegerField(verbose_name='被滑动的用户')
@@ -17,6 +17,16 @@ class Slide(models.Model):
         # 设置联合唯一，不能对同一个用户进行两次操作
         unique_together = ['uid', 'sid']
         db_table = 'slide'
+
+    @classmethod
+    def is_liked(cls, uid, sid):
+        slide = Slide.objects.filter(uid=uid, sid=sid).first()
+        if not slide:
+            return None
+        elif slide.slide_type in ['like', 'superlike']:
+            return True
+        elif slide.slide_type == 'dislike':
+            return False
 
 
 class Friend(models.Model):

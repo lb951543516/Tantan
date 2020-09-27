@@ -1,3 +1,6 @@
 '''缓存中出现的Key'''
 
-VCODE_K = 'Vcode-%s'  # 验证码缓存，拼接手机号
+# 验证码缓存，拼接手机号
+VCODE_K = 'Vcode-%s'
+
+FIRST_RCMD_Q = 'FirstRcmdQ-%s'
