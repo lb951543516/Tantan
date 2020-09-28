@@ -1,52 +1,40 @@
-from django.core.cache import cache
-from django.http import JsonResponse
-
-from UserApp.logics import send_code
+from UserApp.logics import send_vcode
 from UserApp.models import User, Profile
 from UserApp.forms import UserForm, ProfileForm
+from common import errors, keys
+
+from libs.qn_cloud import get_token, get_res_url
+from libs.cache import rds
+from libs.http import render_json
+
 
 # 用户获取手机验证码
-from libs.qn_cloud import get_token, get_res_url
-
-
 def fetch_code(request):
     phonenum = request.GET.get('phonenum')
+    # 异步调用--异步发送短信验证码
+    send_vcode.delay(phonenum)
 
-    if send_code(phonenum):
-        data = {
-            'code': 0,
-            'data': None,
-        }
-        return JsonResponse(data=data)
-    else:
-        data = {
-            'code': 1000,
-            'data': '验证码发送失败',
-        }
-        return JsonResponse(data=data)
+    return render_json()
 
 
 # 提交手机验证码
 def submit_code(request):
     phonenum = request.POST.get('phonenum')
-    code = request.POST.get('code')
+    vcode = request.POST.get('vcode')
 
     # 检查验证码是否正确
-    key = 'code-%s' % phonenum
-    cache_code = cache.get(key)
+    key = keys.VCODE_K % phonenum
+    cache_code = rds.get(key)
 
     # 验证码正确时...
-    if code and code == cache_code:
+    if vcode and vcode == cache_code:
         user_num = User.objects.filter(phonenum=phonenum).count()
         # 如果验证码正确并且已有帐号时...
         if user_num == 1:
             user = User.objects.filter(phonenum=phonenum)[0]
+            request.session['uid'] = user.id
 
-            data = {
-                'code': 0,
-                'data': user.to_dict(),
-            }
-            return JsonResponse(data=data)
+            return render_json(data=user.to_dict())
 
         # 如果验证码正确 没有帐号时...
         elif user_num == 0:
@@ -57,18 +45,10 @@ def submit_code(request):
             # 设置session
             request.session['uid'] = user.id
 
-            data = {
-                'code': 0,
-                'data': user.to_dict(),
-            }
-            return JsonResponse(data=data)
+            return render_json(data=user.to_dict())
     # 验证码错误时...
     else:
-        data = {
-            'code': 1001,
-            'data': '验证码错误',
-        }
-        return JsonResponse(data=data)
+        raise errors.VcodeErr('验证码错误')
 
 
 # 查看个人资料
@@ -76,16 +56,12 @@ def show_profile(request):
     uid = request.session.get('uid')
     profile = Profile.objects.filter(id=uid)[0]
 
-    data = {
-        'code': 0,
-        'data': profile.to_dict(),
-    }
-    return JsonResponse(data=data)
+    return render_json(data=profile.to_dict())
 
 
-# 更新个人资料
+# 修改个人资料
 def update_profile(request):
-    # 定义form对象
+    # 定义form对象，，注意两个模型的字段不能同名
     user_form = UserForm(request.POST)
     profile_form = ProfileForm(request.POST)
 
@@ -93,27 +69,16 @@ def update_profile(request):
     if user_form.is_valid() and profile_form.is_valid():
         uid = request.session.get('uid')
 
-        # 更新用户个人信息
+        # 更新用户个人信息-------- **字典名，可以按照相同的key进行传值
         User.objects.filter(id=uid).update(**user_form.cleaned_data)
         Profile.objects.filter(id=uid).update(**profile_form.cleaned_data)
 
-        print(user_form.cleaned_data)
-        print(profile_form.cleaned_data)
-
-        data = {
-            'code': 0,
-            'data': '修改信息成功'
-        }
-        return JsonResponse(data=data)
+        return render_json(data='修改信息成功')
     else:
         err = {}
         err.update(user_form.errors)
         err.update(profile_form.errors)
-        data = {
-            'code': 1003,
-            'data': err,
-        }
-        return JsonResponse(data=data)
+        raise errors.ProfileErr(data=err)
 
 
 # 获取七牛云 Token
@@ -123,13 +88,10 @@ def qn_token(request):
     token = get_token(uid, filename)
 
     data = {
-        'code': 0,
-        'data': {
-            'key': filename,
-            'token': token,
-        },
+        'key': filename,
+        'token': token,
     }
-    return JsonResponse(data=data)
+    return render_json(code=errors.OK, data=data)
 
 
 # 七牛云回调
@@ -141,8 +103,4 @@ def qn_callback(request):
     avatar_url = get_res_url(key)
     User.objects.filter(id=uid).update(avatar=avatar_url)
 
-    data = {
-        'code': 0,
-        'data': avatar_url,
-    }
-    return JsonResponse(data=data)
+    return render_json(data=avatar_url, code=errors.OK)

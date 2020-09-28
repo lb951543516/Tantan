@@ -29,8 +29,11 @@ class User(models.Model):
 
     @property
     def profile(self):
-        _profile, _ = Profile.objects.get_or_create(user_id=self.id)
-        return _profile
+        if not hasattr(self, '_profile'):
+            # 如果获取不到，就创建。第一个返回值是正常对象，第二个返回值是created=T/F
+            self._profile, created = Profile.objects.get_or_create(id=self.id)
+
+        return self._profile  # 当前用户对应的profile
 
     def to_dict(self):
         return {
@@ -49,10 +52,13 @@ class Profile(models.Model):
 
     dating_gender = models.CharField(max_length=10, choices=User.GENDERS, default='female', verbose_name='匹配性别')
     dating_location = models.CharField(max_length=10, choices=User.LOCATIONS, default='上海', verbose_name='目标城市')
+
     max_distance = models.FloatField(default=10, verbose_name='最大查找范围')
     min_distance = models.FloatField(default=0, verbose_name='最小查找范围')
+
     max_dating_age = models.IntegerField(default=60, verbose_name='最大交友年龄')
     min_dating_age = models.IntegerField(default=15, verbose_name='最小交友年龄')
+
     vibration = models.BooleanField(default=False, verbose_name='开启震动')
     only_matched = models.BooleanField(default=False, verbose_name='允许查看我的相册')
     auto_play = models.BooleanField(default=True, verbose_name='自动播放视频')
