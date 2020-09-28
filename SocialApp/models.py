@@ -1,5 +1,6 @@
 from django.db import models
 from django.db import IntegrityError
+from django.db.models import Q
 
 from common import errors
 
@@ -58,3 +59,17 @@ class Friend(models.Model):
     def broken(cls, uid1, uid2):
         uid1, uid2 = (uid1, uid2) if uid1 < uid2 else (uid2, uid1)
         cls.objects.filter(uid1=uid1, uid2=uid2).delete()
+
+    @classmethod
+    def find_friends(cls, uid):
+        condition = Q(uid1=uid) | Q(uid2=uid)
+        friend_list = Friend.objects.filter(condition)
+
+        fid_list = []
+        for f in friend_list:
+            if f.uid1 == uid:
+                fid_list.append(f.uid2)
+            else:
+                fid_list.append(f.uid1)
+
+        return fid_list

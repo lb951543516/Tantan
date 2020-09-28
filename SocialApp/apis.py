@@ -1,6 +1,4 @@
-from django.db.models import Max
-
-from SocialApp.models import Slide
+from SocialApp.models import Slide, Friend
 from UserApp.models import User
 from libs.http import render_json
 from SocialApp import logics
@@ -47,9 +45,13 @@ def rewind(request):
 
 # 喜欢我的
 def fans(request):
+    # 我滑过的人的id
+    my_slide_list = Slide.objects.filter(uid=request.uid).values_list('sid', flat=True)
+
+    # 查看除了我滑过的以外，喜欢我的人
     slides_list = Slide.objects.filter(
         sid=request.uid, slide_type__in=['like', 'superlike']
-    ).values_list('uid', flat=True)
+    ).exclude(uid__in=my_slide_list).values_list('uid', flat=True)
 
     user_list = User.objects.filter(id__in=slides_list)
     data = [user.to_dict() for user in user_list]
@@ -58,7 +60,11 @@ def fans(request):
 
 # 好友列表
 def friends(request):
-    return render_json()
+    fid_list = Friend.find_friends(request.uid)
+    user_list = User.objects.filter(id__in=fid_list)
+
+    data = [user.to_dict() for user in user_list]
+    return render_json(data=data)
 
 
 # 我的热度排名
