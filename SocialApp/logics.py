@@ -1,10 +1,13 @@
 import datetime
+from django.db.transaction import atomic
 
 from SocialApp.models import Slide, Friend
 from UserApp.models import User
 from UserApp.models import Profile
 from common import keys
+from common import errors
 from libs.cache import rds
+from Tantan import config
 
 
 def rcmd_from_queue(uid):
@@ -50,10 +53,11 @@ def rcmd(uid):
         return first_users
 
 
+@atomic
 def like_someone(uid, sid):
     '''喜欢的人'''
     # 1.添加滑动记录
-    Slide.objects.create(uid=uid, sid=sid, slide_type='like')
+    Slide.slide(uid=uid, sid=sid, slide_type='like')
 
     # 2.强制删除优先推荐队列里的id
     rds.lrem(keys.FIRST_RCMD_Q % uid, count=0, value=sid)
@@ -67,10 +71,11 @@ def like_someone(uid, sid):
         return False
 
 
+@atomic
 def superlike_someone(uid, sid):
     '''超级喜欢'''
     # 1.添加滑动记录
-    Slide.objects.create(uid=uid, sid=sid, slide_type='superlike')
+    Slide.slide(uid=uid, sid=sid, slide_type='superlike')
 
     # 2.强制删除优先推荐队列里的id
     rds.lrem(keys.FIRST_RCMD_Q % uid, count=0, value=sid)
@@ -91,7 +96,40 @@ def superlike_someone(uid, sid):
 def dislike_someone(uid, sid):
     '''不喜欢'''
     # 1.添加滑动记录
-    Slide.objects.create(uid=uid, sid=sid, slide_type='dislike')
+    Slide.slide(uid=uid, sid=sid, slide_type='dislike')
 
     # 2.强制删除优先推荐队列里的id
     rds.lrem(keys.FIRST_RCMD_Q % uid, count=0, value=sid)
+
+
+def rewind_slide(uid):
+    '''反悔(每天3次，5分钟内)'''
+    now_time = datetime.datetime.now()
+    today = now_time.date()
+    rewind_key = keys.REWIND_K % (today, uid)
+
+    # 检查是否已经3次
+    rewind_num = rds.get(rewind_key, 0)
+    if rewind_num >= config.REWIND_TIMES:
+        raise errors.RewindLimit
+
+    # 检查最后一次滑动是否在5分钟内
+    last_slide = Slide.objects.filter(uid=uid).latest('slide_time')
+
+    if now_time > last_slide.slide_time + datetime.timedelta(minutes=config.REWIND_TIMEOUT):
+        raise errors.RewindTimeout
+
+    with atomic():  # 将多次数据修改在事务中执行
+        # 检查是否是好友
+        if last_slide.slide_type in ['like', 'superlike']:
+            Friend.broken(uid, last_slide.sid)
+
+            if last_slide.slide_type == 'superlike':
+                # 从对方的推荐列表里删除我的id
+                rds.lrem(keys.FIRST_RCMD_Q % last_slide.sid, count=0, value=uid)
+
+        # 删除最后一次滑动
+        last_slide.delete()
+
+        # 设置缓存，反悔次数加一
+        rds.set(rewind_key, rewind_num + 1, 86400)

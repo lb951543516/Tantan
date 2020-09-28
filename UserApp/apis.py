@@ -14,11 +14,6 @@ def fetch_code(request):
     # 异步调用--异步发送短信验证码
     send_vcode.delay(phonenum)
 
-    # if send_code(phonenum):
-    #     return render_json()
-    # else:
-    #     data = render_json(data='验证码发送失败', code=errors.VCODE_FAILD)
-    #     return JsonResponse(data=data)
     return render_json()
 
 

@@ -41,8 +41,7 @@ def dislike(request):
 
 # 反悔
 def rewind(request):
-    last_slide = Slide.objects.filter(uid=request.uid).aggregate(Max('slide_time'))
-    last_slide.delete()
+    logics.rewind_slide(request.uid)
     return render_json()
 
 

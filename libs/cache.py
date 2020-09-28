@@ -22,4 +22,4 @@ class MyRedis(Redis):
             return value
 
 
-rds = Redis(**REDIS)
+rds = MyRedis(**REDIS)

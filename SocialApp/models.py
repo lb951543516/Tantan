@@ -53,3 +53,8 @@ class Friend(models.Model):
     def make_friend(cls, uid1, uid2):
         uid1, uid2 = (uid1, uid2) if uid1 < uid2 else (uid2, uid1)
         cls.objects.create(uid1=uid1, uid2=uid2)
+
+    @classmethod
+    def broken(cls, uid1, uid2):
+        uid1, uid2 = (uid1, uid2) if uid1 < uid2 else (uid2, uid1)
+        cls.objects.filter(uid1=uid1, uid2=uid2).delete()
