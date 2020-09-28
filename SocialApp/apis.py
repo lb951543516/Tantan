@@ -1,5 +1,6 @@
 from SocialApp.models import Slide, Friend
 from UserApp.models import User
+from VipApp.logics import perm_required
 from libs.http import render_json
 from SocialApp import logics
 from common import errors
@@ -22,6 +23,7 @@ def like(request):
 
 
 # 超级喜欢
+@perm_required('superlike')
 def super_like(request):
     sid = int(request.POST.get('sid'))
     is_matched = logics.superlike_someone(request.uid, sid)
@@ -38,12 +40,14 @@ def dislike(request):
 
 
 # 反悔
+@perm_required('rewind')
 def rewind(request):
     logics.rewind_slide(request.uid)
     return render_json()
 
 
 # 喜欢我的
+@perm_required('fans')
 def fans(request):
     # 我滑过的人的id
     my_slide_list = Slide.objects.filter(uid=request.uid).values_list('sid', flat=True)

@@ -53,6 +53,7 @@ def rcmd(uid):
         return first_users
 
 
+# 将函数放在事务中执行，出错会自动回滚，成功自动提交
 @atomic
 def like_someone(uid, sid):
     '''喜欢的人'''
@@ -119,7 +120,8 @@ def rewind_slide(uid):
     if now_time > last_slide.slide_time + datetime.timedelta(minutes=config.REWIND_TIMEOUT):
         raise errors.RewindTimeout
 
-    with atomic():  # 将多次数据修改在事务中执行
+    # 将多次数据修改在事务中执行
+    with atomic():
         # 检查是否是好友
         if last_slide.slide_type in ['like', 'superlike']:
             Friend.broken(uid, last_slide.sid)
