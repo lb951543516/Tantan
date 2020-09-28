@@ -65,8 +65,3 @@ def friends(request):
 
     data = [user.to_dict() for user in user_list]
     return render_json(data=data)
-
-
-# 我的热度排名
-def rank(request):
-    return render_json()
