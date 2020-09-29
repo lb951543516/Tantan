@@ -2,6 +2,10 @@ from django.utils.deprecation import MiddlewareMixin
 from common import errors
 from libs.http import render_json
 
+import logging
+
+err_log = logging.getLogger('err')
+
 
 class AuthMiddleware(MiddlewareMixin):
     '''登录验证中间件'''

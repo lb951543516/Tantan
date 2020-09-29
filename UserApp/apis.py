@@ -1,11 +1,14 @@
+import logging
+
 from UserApp.logics import send_vcode
 from UserApp.models import User, Profile
 from UserApp.forms import UserForm, ProfileForm
 from common import errors, keys
-
 from libs.qn_cloud import get_token, get_res_url
 from libs.cache import rds
 from libs.http import render_json
+
+inf_log = logging.getLogger('inf')
 
 
 # 用户获取手机验证码
@@ -32,6 +35,7 @@ def submit_code(request):
         # 如果验证码正确并且已有帐号时...
         if user_num == 1:
             user = User.objects.filter(phonenum=phonenum)[0]
+            inf_log.info(f'User Login:{user.id}/{user.phonenum}')
             request.session['uid'] = user.id
 
             return render_json(data=user.to_dict())
@@ -42,6 +46,8 @@ def submit_code(request):
             user = User.objects.create(phonenum=phonenum, nickname=phonenum)
             # 添加 用户资料
             profile = Profile.objects.create(id=user.id)
+            # 日志
+            inf_log.info(f'User Register:{user.id}/{user.phonenum}')
             # 设置session
             request.session['uid'] = user.id
 
