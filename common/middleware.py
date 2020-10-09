@@ -35,5 +35,5 @@ class LogicErrMiddleware(MiddlewareMixin):
 
     def process_exception(self, request, exception):
         if isinstance(exception, errors.LogicErr):
-            code = exception.code
-            return render_json(code=code)
+            err_log.error(f'逻辑异常: {exception.code}: {exception.data}')
+            return render_json(exception.data, exception.code)

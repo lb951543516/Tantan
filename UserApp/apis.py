@@ -60,7 +60,16 @@ def submit_code(request):
 # 查看个人资料
 def show_profile(request):
     uid = request.session.get('uid')
-    profile = Profile.objects.filter(id=uid)[0]
+    key = keys.PROFILE_K % uid
+
+    profile = rds.get(key)
+    inf_log.debug(f'从缓存中获取数据: {profile}')
+
+    if profile is None:
+        profile, _ = Profile.objects.get_or_create(id=uid)
+        inf_log.debug(f'从数据库中获取数据: {profile}')
+        rds.set(key, profile)
+        inf_log.debug('将数据写入到缓存')
 
     return render_json(data=profile.to_dict())
 
@@ -78,6 +87,9 @@ def update_profile(request):
         # 更新用户个人信息-------- **字典名，可以按照相同的key进行传值
         User.objects.filter(id=uid).update(**user_form.cleaned_data)
         Profile.objects.filter(id=uid).update(**profile_form.cleaned_data)
+
+        inf_log.debug('删除旧缓存')
+        rds.delete(keys.PROFILE_K % uid)
 
         return render_json(data='修改信息成功')
     else:
