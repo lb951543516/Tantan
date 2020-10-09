@@ -1,4 +1,5 @@
 from SocialApp.models import Slide, Friend
+from Tantan import config
 from UserApp.models import User
 from VipApp.logics import perm_required
 from libs.http import render_json
@@ -68,4 +69,10 @@ def friends(request):
     user_list = User.objects.filter(id__in=fid_list)
 
     data = [user.to_dict() for user in user_list]
+    return render_json(data=data)
+
+
+# 前50热度排行
+def hot_rank(request):
+    data = logics.get_top_n(config.RANK_NUM)
     return render_json(data=data)

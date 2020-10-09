@@ -63,6 +63,9 @@ def like_someone(uid, sid):
     # 2.强制删除优先推荐队列里的id
     rds.lrem(keys.FIRST_RCMD_Q % uid, count=0, value=sid)
 
+    # 给被滑动者添加积分
+    rds.zincrby(keys.HOT_RANK, config.SLIDE_SCORE['like'], sid)
+
     # 3.检查对方是否喜欢自己，如果喜欢那么建立好友关系
     is_like = Slide.is_liked(uid=sid, sid=uid)
     if is_like is True:
@@ -80,6 +83,9 @@ def superlike_someone(uid, sid):
 
     # 2.强制删除优先推荐队列里的id
     rds.lrem(keys.FIRST_RCMD_Q % uid, count=0, value=sid)
+
+    # 给被滑动者添加积分
+    rds.zincrby(keys.HOT_RANK, config.SLIDE_SCORE['superlike'], sid)
 
     # 3.检查对方是否喜欢自己，如果喜欢那么建立好友关系
     is_like = Slide.is_liked(uid=sid, sid=uid)
@@ -101,6 +107,9 @@ def dislike_someone(uid, sid):
 
     # 2.强制删除优先推荐队列里的id
     rds.lrem(keys.FIRST_RCMD_Q % uid, count=0, value=sid)
+
+    # 给被滑动者添加积分
+    rds.zincrby(keys.HOT_RANK, config.SLIDE_SCORE['dislike'], sid)
 
 
 def rewind_slide(uid):
@@ -130,8 +139,39 @@ def rewind_slide(uid):
                 # 从对方的推荐列表里删除我的id
                 rds.lrem(keys.FIRST_RCMD_Q % last_slide.sid, count=0, value=uid)
 
+        # 撤回被滑动者的积分
+        score = config.SLIDE_SCORE[last_slide.slide_type]
+        rds.zincrby(keys.HOT_RANK, -score, last_slide.sid)
+
         # 删除最后一次滑动
         last_slide.delete()
 
         # 设置缓存，反悔次数加一
         rds.set(rewind_key, rewind_num + 1, 86400)
+
+
+def get_top_n(RANK_NUM):
+    '''获取排行榜前n名的用户数据'''
+    # 从redis里取出原始数据
+    origin_data = rds.zrevrange(keys.HOT_RANK, 0, RANK_NUM - 1)
+    # 原始数据转换成int类型
+    cleaned_data = [[int(uid), int(score)] for uid, score in origin_data]
+
+    # 用户的id列表
+    uid_list = [item[0] for item in cleaned_data]
+
+    # 数据库取数据
+    users = User.objects.filter(id__in=uid_list)
+    users = sorted(users, key=lambda user: uid_list.index(user.id))
+
+    # 整理数据
+    rank_data = []
+    for index, (uid, score) in enumerate(cleaned_data):
+        rank = index + 1
+        user = users[index]
+        user_data = user.to_dict()
+        user_data['rank'] = rank
+        user_data['score'] = score
+        rank_data.append(user_data)
+
+    return rank_data

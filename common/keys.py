@@ -11,3 +11,6 @@ REWIND_K = 'Rewind-%s-%s'
 
 PROFILE_K = 'Profile-%s'  # 用户交友资料的 Key，拼接 Profile.id
 MODEL_K = 'Model-%s-%s'  # 模型缓存的 Key，拼接 Model 名 和 对象的主键
+
+# 滑动积分
+HOT_RANK = 'HOT_RANK'
