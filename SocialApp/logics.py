@@ -153,7 +153,7 @@ def rewind_slide(uid):
 def get_top_n(RANK_NUM):
     '''获取排行榜前n名的用户数据'''
     # 从redis里取出原始数据
-    origin_data = rds.zrevrange(keys.HOT_RANK, 0, RANK_NUM - 1)
+    origin_data = rds.zrevrange(keys.HOT_RANK, 0, RANK_NUM - 1, withscores=True)
     # 原始数据转换成int类型
     cleaned_data = [[int(uid), int(score)] for uid, score in origin_data]
 
@@ -169,7 +169,8 @@ def get_top_n(RANK_NUM):
     for index, (uid, score) in enumerate(cleaned_data):
         rank = index + 1
         user = users[index]
-        user_data = user.to_dict()
+        user_data = user.to_dict(exclude=['phonenum', 'birthday', 'location',
+                                          'vip_id', 'vip_end'])
         user_data['rank'] = rank
         user_data['score'] = score
         rank_data.append(user_data)

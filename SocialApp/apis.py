@@ -10,7 +10,7 @@ from common import errors
 # 推荐用户
 def rcmd_users(request):
     users = logics.rcmd(request.uid)
-    data = [user.to_dict() for user in users]
+    data = [user.to_dict(exclude=['phonenum']) for user in users]
     return render_json(data=data, code=errors.OK)
 
 
@@ -59,7 +59,7 @@ def fans(request):
     ).exclude(uid__in=my_slide_list).values_list('uid', flat=True)
 
     user_list = User.objects.filter(id__in=slides_list)
-    data = [user.to_dict() for user in user_list]
+    data = [user.to_dict(exclude=['phonenum']) for user in user_list]
     return render_json(data=data)
 
 

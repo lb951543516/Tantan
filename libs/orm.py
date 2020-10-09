@@ -1,3 +1,5 @@
+import datetime
+
 from django.db.models import query
 from django.db import models
 
@@ -45,6 +47,26 @@ def save(self, force_insert=False, force_update=False, using=None,
     rds.set(key, self)
 
 
+def to_dict(self, exclude=()):
+    '''用户属性转换成一个字典'''
+    # 找到对象的所有字段名
+    # 找到字段对应的值
+    # 组装字典（忽略exclude中的字段）
+
+    attr_dict = {}
+    for field in self._meta.fields:
+        if field.attrname in exclude:
+            continue
+
+        value = getattr(self, field.attrname)
+        if isinstance(value, (datetime.datetime, datetime.date)):
+            value = str(value)
+
+        attr_dict[field.attrname] = value
+
+    return attr_dict
+
+
 def path_orm():
     '''通过 Monkey Patch 的方式为 ORM 增加缓存处理'''
     query.QuerySet._get = query.QuerySet.get
@@ -52,3 +74,5 @@ def path_orm():
 
     models.Model._save = models.Model.save
     models.Model.save = save
+
+    models.Model.to_dict = to_dict

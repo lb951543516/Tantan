@@ -62,17 +62,6 @@ class User(models.Model):
         self._vip = vip
         self.save()
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'phonenum': self.phonenum,
-            'nickname': self.nickname,
-            'gender': self.gender,
-            'birthday': str(self.birthday),
-            'avatar': self.avatar,
-            'location': self.location,
-        }
-
 
 class Profile(models.Model):
     '''用户匹配对象的模型'''
@@ -92,16 +81,3 @@ class Profile(models.Model):
 
     class Meta:
         db_table = 'profile'
-
-    def to_dict(self):
-        return {
-            'dating_gender': self.dating_gender,
-            'dating_location': self.dating_location,
-            'max_distance': self.max_distance,
-            'min_distance': self.min_distance,
-            'max_dating_age': self.max_dating_age,
-            'min_dating_age': self.min_dating_age,
-            'vibration': self.vibration,
-            'only_matched': self.only_matched,
-            'auto_play': self.auto_play,
-        }
