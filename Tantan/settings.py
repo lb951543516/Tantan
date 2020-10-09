@@ -153,14 +153,14 @@ LOGGING = {
         'info': {
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'filename': f'{BASE_DIR}/logs/info.log',  # 日志保存路径
-            'when': 'midnight',  # 每天切割日志
+            'when': 'midnight',  # 每天午夜切割日志
             'backupCount': 30,  # 日志保留 30 天
             'formatter': 'simple',
         },
         'error': {
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'filename': f'{BASE_DIR}/logs/error.log',  # 日志保存路径
-            'when': 'W0',  # 每周一切割日志
+            'when': 'W0',  # 每周一切割日志(周一到周日W0~W6)
             'backupCount': 4,  # 日志保留 4 周
             'formatter': 'verbose',
         }
@@ -170,7 +170,7 @@ LOGGING = {
         'django': {
             'handlers': ['console'],
             # 将 Django 自身日志设置成 DEBUG 级别可以在控制台打印出 Django ORM 生成的 SQL 语句
-            'level': 'DEBUG' if DEBUG else 'INFO',
+            'level': 'INFO',
         },
         'inf': {
             'handlers': ['info'],

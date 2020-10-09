@@ -7,6 +7,7 @@ from libs.cache import rds
 from common.keys import MODEL_K
 
 
+# 重写 函数名、参数、返回值不能变
 def get(self, *args, **kwargs):
     """
     Perform the query and return a single object matching the given
@@ -49,20 +50,18 @@ def save(self, force_insert=False, force_update=False, using=None,
 
 def to_dict(self, exclude=()):
     '''用户属性转换成一个字典'''
-    # 找到对象的所有字段名
-    # 找到字段对应的值
-    # 组装字典（忽略exclude中的字段）
 
+    # 找到对象的所有字段名
     attr_dict = {}
     for field in self._meta.fields:
-        if field.attrname in exclude:
+        if field.attname in exclude:
             continue
-
-        value = getattr(self, field.attrname)
+        # 找到字段对应的值
+        value = getattr(self, field.attname)
         if isinstance(value, (datetime.datetime, datetime.date)):
             value = str(value)
-
-        attr_dict[field.attrname] = value
+        # 组装字典（忽略exclude中的字段）
+        attr_dict[field.attname] = value
 
     return attr_dict
 

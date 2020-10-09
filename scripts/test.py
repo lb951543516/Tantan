@@ -13,3 +13,5 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Tantan.settings')
 
 # 第三步：Django 环境初始化
 django.setup()
+
+from UserApp.models import User

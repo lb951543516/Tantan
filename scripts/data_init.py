@@ -6,9 +6,6 @@ import sys
 import django
 from datetime import date
 
-from UserApp.models import User
-from VipApp.models import Permission, VipPermRelation
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 
@@ -17,6 +14,9 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Tantan.settings')
 
 # 加载settings里定义的模块,# 初始化 Django 环境
 django.setup()
+
+from UserApp.models import User
+from VipApp.models import Permission, VipPermRelation, Vip
 
 last_names = (
     '赵钱孙李周吴郑王冯陈褚卫蒋沈韩杨'

@@ -62,6 +62,7 @@ def show_profile(request):
     uid = request.session.get('uid')
     key = keys.PROFILE_K % uid
 
+    # 先从缓存获取数据，没有就冲数据库获取，然后存在缓存里面
     profile = rds.get(key)
     inf_log.debug(f'从缓存中获取数据: {profile}')
 
@@ -82,7 +83,7 @@ def update_profile(request):
 
     # 检查验证数据
     if user_form.is_valid() and profile_form.is_valid():
-        uid = request.session.get('uid')
+        uid = request.uid
 
         # 更新用户个人信息-------- **字典名，可以按照相同的key进行传值
         User.objects.filter(id=uid).update(**user_form.cleaned_data)
