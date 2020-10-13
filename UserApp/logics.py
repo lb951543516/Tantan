@@ -1,10 +1,19 @@
 import random
 import re
+<<<<<<< HEAD
+import logging
+=======
+>>>>>>> master
 
 from libs.send_sms import send_sms
 from libs.cache import rds
 from common import keys
 from tasks import celery_app
+<<<<<<< HEAD
+
+inf_log = logging.getLogger('inf')
+=======
+>>>>>>> master
 
 
 # 验证手机号
@@ -35,7 +44,7 @@ def send_vcode(phone):
 
     # 手机号正确，发送验证码
     code = make_code(6)
-    print(code)
+    inf_log.debug(f'验证码:{phone}-{code}')
     # 设置缓存，设置验证码的有效时间
     rds.set(key, code, 600)
     return send_sms(phone, code)

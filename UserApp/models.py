@@ -1,4 +1,8 @@
+import datetime
+
 from django.db import models
+
+from VipApp.models import Vip
 
 
 class User(models.Model):
@@ -23,6 +27,8 @@ class User(models.Model):
     birthday = models.DateField(default='2000-01-01', verbose_name='生日')
     avatar = models.CharField(max_length=256, verbose_name='头像')
     location = models.CharField(max_length=10, choices=LOCATIONS, default='上海', verbose_name='所在地')
+    vip_id = models.IntegerField(verbose_name='用户的vip的id', default=1)
+    vip_end = models.DateTimeField(default='9999-12-31', verbose_name='vip过期时间')
 
     class Meta:
         db_table = 'user'
@@ -34,17 +40,30 @@ class User(models.Model):
             self._profile, created = Profile.objects.get_or_create(id=self.id)
 
         return self._profile  # 当前用户对应的profile
+<<<<<<< HEAD
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'phonenum': self.phonenum,
-            'nickname': self.nickname,
-            'gender': self.gender,
-            'birthday': str(self.birthday),
-            'avatar': self.avatar,
-            'location': self.location,
-        }
+    @property
+    def vip(self):
+        '''当前用户的vip'''
+        # 检查是否过期
+        now = datetime.datetime.now()
+        if now >= self.vip_end:
+            self.set_vip(1)
+=======
+>>>>>>> master
+
+        if not hasattr(self, '_vip'):
+            self._vip = Vip.objects.get(id=self.vip_id)
+        # 返回用户的vip对象
+        return self._vip
+
+    def set_vip(self, vip_id):
+        '''设置当前用户的vip'''
+        vip = Vip.objects.get(id=vip_id)
+        self.vip_id = vip_id
+        self.vip_end = datetime.datetime.now() + datetime.timedelta(days=vip.duration)
+        self._vip = vip
+        self.save()
 
 
 class Profile(models.Model):
@@ -65,16 +84,3 @@ class Profile(models.Model):
 
     class Meta:
         db_table = 'profile'
-
-    def to_dict(self):
-        return {
-            'dating_gender': self.dating_gender,
-            'dating_location': self.dating_location,
-            'max_distance': self.max_distance,
-            'min_distance': self.min_distance,
-            'max_dating_age': self.max_dating_age,
-            'min_dating_age': self.min_dating_age,
-            'vibration': self.vibration,
-            'only_matched': self.only_matched,
-            'auto_play': self.auto_play,
-        }

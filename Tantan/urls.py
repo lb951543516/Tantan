@@ -37,6 +37,10 @@ urlpatterns = [
     path('api/social/rewind', social_api.rewind),
     path('api/social/fans', social_api.fans),
     path('api/social/friends', social_api.friends),
+<<<<<<< HEAD
+    path('api/social/rank', social_api.hot_rank),
+=======
+>>>>>>> master
 
     # 前端页面--首页
     path('', views.index),
