@@ -40,6 +40,7 @@ class User(models.Model):
             self._profile, created = Profile.objects.get_or_create(id=self.id)
 
         return self._profile  # 当前用户对应的profile
+<<<<<<< HEAD
 
     @property
     def vip(self):
@@ -48,6 +49,8 @@ class User(models.Model):
         now = datetime.datetime.now()
         if now >= self.vip_end:
             self.set_vip(1)
+=======
+>>>>>>> master
 
         if not hasattr(self, '_vip'):
             self._vip = Vip.objects.get(id=self.vip_id)

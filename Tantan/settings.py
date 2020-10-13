@@ -38,7 +38,10 @@ INSTALLED_APPS = [
 
     'UserApp',
     'SocialApp',
+<<<<<<< HEAD
     'VipApp',
+=======
+>>>>>>> master
 ]
 
 MIDDLEWARE = [

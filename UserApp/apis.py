@@ -1,14 +1,24 @@
+<<<<<<< HEAD
 import logging
 
+=======
+>>>>>>> master
 from UserApp.logics import send_vcode
 from UserApp.models import User, Profile
 from UserApp.forms import UserForm, ProfileForm
 from common import errors, keys
+<<<<<<< HEAD
 from libs.qn_cloud import get_token, get_res_url
 from libs.cache import rds
 from libs.http import render_json
 
 inf_log = logging.getLogger('inf')
+=======
+
+from libs.qn_cloud import get_token, get_res_url
+from libs.cache import rds
+from libs.http import render_json
+>>>>>>> master
 
 
 # 用户获取手机验证码
@@ -35,7 +45,10 @@ def submit_code(request):
         # 如果验证码正确并且已有帐号时...
         if user_num == 1:
             user = User.objects.filter(phonenum=phonenum)[0]
+<<<<<<< HEAD
             inf_log.info(f'User Login:{user.id}/{user.phonenum}')
+=======
+>>>>>>> master
             request.session['uid'] = user.id
 
             return render_json(data=user.to_dict())
@@ -62,6 +75,7 @@ def show_profile(request):
     uid = request.session.get('uid')
     key = keys.PROFILE_K % uid
 
+<<<<<<< HEAD
     # 先从缓存获取数据，没有就冲数据库获取，然后存在缓存里面
     profile = rds.get(key)
     inf_log.debug(f'从缓存中获取数据: {profile}')
@@ -71,10 +85,16 @@ def show_profile(request):
         inf_log.debug(f'从数据库中获取数据: {profile}')
         rds.set(key, profile)
         inf_log.debug('将数据写入到缓存')
+=======
+    return render_json(data=profile.to_dict())
+>>>>>>> master
 
     return render_json(data=profile.to_dict())
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
 # 修改个人资料
 def update_profile(request):
     # 定义form对象，，注意两个模型的字段不能同名
@@ -89,9 +109,12 @@ def update_profile(request):
         User.objects.filter(id=uid).update(**user_form.cleaned_data)
         Profile.objects.filter(id=uid).update(**profile_form.cleaned_data)
 
+<<<<<<< HEAD
         inf_log.debug('删除旧缓存')
         rds.delete(keys.PROFILE_K % uid)
 
+=======
+>>>>>>> master
         return render_json(data='修改信息成功')
     else:
         err = {}

@@ -53,7 +53,10 @@ def rcmd(uid):
         return first_users
 
 
+<<<<<<< HEAD
 # 将函数放在事务中执行，出错会自动回滚，成功自动提交
+=======
+>>>>>>> master
 @atomic
 def like_someone(uid, sid):
     '''喜欢的人'''
@@ -63,9 +66,12 @@ def like_someone(uid, sid):
     # 2.强制删除优先推荐队列里的id
     rds.lrem(keys.FIRST_RCMD_Q % uid, count=0, value=sid)
 
+<<<<<<< HEAD
     # 给被滑动者添加积分
     rds.zincrby(keys.HOT_RANK, config.SLIDE_SCORE['like'], sid)
 
+=======
+>>>>>>> master
     # 3.检查对方是否喜欢自己，如果喜欢那么建立好友关系
     is_like = Slide.is_liked(uid=sid, sid=uid)
     if is_like is True:
@@ -84,9 +90,12 @@ def superlike_someone(uid, sid):
     # 2.强制删除优先推荐队列里的id
     rds.lrem(keys.FIRST_RCMD_Q % uid, count=0, value=sid)
 
+<<<<<<< HEAD
     # 给被滑动者添加积分
     rds.zincrby(keys.HOT_RANK, config.SLIDE_SCORE['superlike'], sid)
 
+=======
+>>>>>>> master
     # 3.检查对方是否喜欢自己，如果喜欢那么建立好友关系
     is_like = Slide.is_liked(uid=sid, sid=uid)
     if is_like is True:
@@ -108,9 +117,12 @@ def dislike_someone(uid, sid):
     # 2.强制删除优先推荐队列里的id
     rds.lrem(keys.FIRST_RCMD_Q % uid, count=0, value=sid)
 
+<<<<<<< HEAD
     # 给被滑动者添加积分
     rds.zincrby(keys.HOT_RANK, config.SLIDE_SCORE['dislike'], sid)
 
+=======
+>>>>>>> master
 
 def rewind_slide(uid):
     '''反悔(每天3次，5分钟内)'''
@@ -129,8 +141,12 @@ def rewind_slide(uid):
     if now_time > last_slide.slide_time + datetime.timedelta(minutes=config.REWIND_TIMEOUT):
         raise errors.RewindTimeout
 
+<<<<<<< HEAD
     # 将多次数据修改在事务中执行
     with atomic():
+=======
+    with atomic():  # 将多次数据修改在事务中执行
+>>>>>>> master
         # 检查是否是好友
         if last_slide.slide_type in ['like', 'superlike']:
             Friend.broken(uid, last_slide.sid)
@@ -139,15 +155,19 @@ def rewind_slide(uid):
                 # 从对方的推荐列表里删除我的id
                 rds.lrem(keys.FIRST_RCMD_Q % last_slide.sid, count=0, value=uid)
 
+<<<<<<< HEAD
         # 撤回被滑动者的积分
         score = config.SLIDE_SCORE[last_slide.slide_type]
         rds.zincrby(keys.HOT_RANK, -score, last_slide.sid)
 
+=======
+>>>>>>> master
         # 删除最后一次滑动
         last_slide.delete()
 
         # 设置缓存，反悔次数加一
         rds.set(rewind_key, rewind_num + 1, 86400)
+<<<<<<< HEAD
 
 
 def get_top_n(RANK_NUM):
@@ -176,3 +196,5 @@ def get_top_n(RANK_NUM):
         rank_data.append(user_data)
 
     return rank_data
+=======
+>>>>>>> master

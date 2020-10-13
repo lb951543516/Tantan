@@ -1,10 +1,13 @@
 from django.utils.deprecation import MiddlewareMixin
 from common import errors
 from libs.http import render_json
+<<<<<<< HEAD
 
 import logging
 
 err_log = logging.getLogger('err')
+=======
+>>>>>>> master
 
 
 class AuthMiddleware(MiddlewareMixin):
@@ -15,7 +18,10 @@ class AuthMiddleware(MiddlewareMixin):
         '/api/user/vcode/submit',
         '/qiniu/callback',
         '/',
+<<<<<<< HEAD
         '/api/social/rank,'
+=======
+>>>>>>> master
     ]
 
     def process_request(self, request):
@@ -36,5 +42,10 @@ class LogicErrMiddleware(MiddlewareMixin):
 
     def process_exception(self, request, exception):
         if isinstance(exception, errors.LogicErr):
+<<<<<<< HEAD
             err_log.error(f'逻辑异常: {exception.code}: {exception.data}')
             return render_json(exception.data, exception.code)
+=======
+            code = exception.code
+            return render_json(code=code)
+>>>>>>> master
