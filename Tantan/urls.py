@@ -21,6 +21,9 @@ from SocialApp import apis as social_api
 from home import views
 
 urlpatterns = [
+    # 前端页面--首页
+    path('', views.index),
+
     # user模块
     path('api/user/vcode/fetch', user_api.fetch_code),
     path('api/user/vcode/submit', user_api.submit_code),
@@ -38,9 +41,5 @@ urlpatterns = [
     path('api/social/fans', social_api.fans),
     path('api/social/friends', social_api.friends),
     path('api/social/rank', social_api.hot_rank),
-
-
-    # 前端页面--首页
-    path('', views.index),
 
 ]
