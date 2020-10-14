@@ -17,7 +17,6 @@ from django.urls import path
 
 from UserApp import apis as user_api
 from SocialApp import apis as social_api
-
 from home import views
 
 urlpatterns = [

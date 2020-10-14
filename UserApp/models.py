@@ -49,7 +49,6 @@ class User(models.Model):
         if now >= self.vip_end:
             self.set_vip(1)
 
-
         if not hasattr(self, '_vip'):
             self._vip = Vip.objects.get(id=self.vip_id)
         # 返回用户的vip对象
